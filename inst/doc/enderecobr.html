@@ -1,0 +1,732 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+
+<meta charset="utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+
+
+<title>enderecobr: padronizador de endereços brasileiros</title>
+
+<script>// Pandoc 2.9 adds attributes on both header and div. We remove the former (to
+// be compatible with the behavior of Pandoc < 2.8).
+document.addEventListener('DOMContentLoaded', function(e) {
+  var hs = document.querySelectorAll("div.section[class*='level'] > :first-child");
+  var i, h, a;
+  for (i = 0; i < hs.length; i++) {
+    h = hs[i];
+    if (!/^h[1-6]$/i.test(h.tagName)) continue;  // it should be a header h1-h6
+    a = h.attributes;
+    while (a.length > 0) h.removeAttribute(a[0].name);
+  }
+});
+</script>
+
+<style type="text/css">
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+span.underline{text-decoration: underline;}
+div.column{display: inline-block; vertical-align: top; width: 50%;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+</style>
+
+
+
+<style type="text/css">
+code {
+white-space: pre;
+}
+.sourceCode {
+overflow: visible;
+}
+</style>
+<style type="text/css" data-origin="pandoc">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+{ counter-reset: source-line 0; }
+pre.numberSource code > span
+{ position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+{ content: counter(source-line);
+position: relative; left: -1em; text-align: right; vertical-align: baseline;
+border: none; display: inline-block;
+-webkit-touch-callout: none; -webkit-user-select: none;
+-khtml-user-select: none; -moz-user-select: none;
+-ms-user-select: none; user-select: none;
+padding: 0 4px; width: 4em;
+color: #aaaaaa;
+}
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa; padding-left: 4px; }
+div.sourceCode
+{ }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } 
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.at { color: #7d9029; } 
+code span.bn { color: #40a070; } 
+code span.bu { color: #008000; } 
+code span.cf { color: #007020; font-weight: bold; } 
+code span.ch { color: #4070a0; } 
+code span.cn { color: #880000; } 
+code span.co { color: #60a0b0; font-style: italic; } 
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.do { color: #ba2121; font-style: italic; } 
+code span.dt { color: #902000; } 
+code span.dv { color: #40a070; } 
+code span.er { color: #ff0000; font-weight: bold; } 
+code span.ex { } 
+code span.fl { color: #40a070; } 
+code span.fu { color: #06287e; } 
+code span.im { color: #008000; font-weight: bold; } 
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } 
+code span.kw { color: #007020; font-weight: bold; } 
+code span.op { color: #666666; } 
+code span.ot { color: #007020; } 
+code span.pp { color: #bc7a00; } 
+code span.sc { color: #4070a0; } 
+code span.ss { color: #bb6688; } 
+code span.st { color: #4070a0; } 
+code span.va { color: #19177c; } 
+code span.vs { color: #4070a0; } 
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } 
+</style>
+<script>
+// apply pandoc div.sourceCode style to pre.sourceCode instead
+(function() {
+  var sheets = document.styleSheets;
+  for (var i = 0; i < sheets.length; i++) {
+    if (sheets[i].ownerNode.dataset["origin"] !== "pandoc") continue;
+    try { var rules = sheets[i].cssRules; } catch (e) { continue; }
+    var j = 0;
+    while (j < rules.length) {
+      var rule = rules[j];
+      // check if there is a div.sourceCode rule
+      if (rule.type !== rule.STYLE_RULE || rule.selectorText !== "div.sourceCode") {
+        j++;
+        continue;
+      }
+      var style = rule.style.cssText;
+      // check if color or background-color is set
+      if (rule.style.color === '' && rule.style.backgroundColor === '') {
+        j++;
+        continue;
+      }
+      // replace div.sourceCode by a pre.sourceCode rule
+      sheets[i].deleteRule(j);
+      sheets[i].insertRule('pre.sourceCode{' + style + '}', j);
+    }
+  }
+})();
+</script>
+
+
+
+
+<style type="text/css">body {
+background-color: #fff;
+margin: 1em auto;
+max-width: 700px;
+overflow: visible;
+padding-left: 2em;
+padding-right: 2em;
+font-family: "Open Sans", "Helvetica Neue", Helvetica, Arial, sans-serif;
+font-size: 14px;
+line-height: 1.35;
+}
+#TOC {
+clear: both;
+margin: 0 0 10px 10px;
+padding: 4px;
+width: 400px;
+border: 1px solid #CCCCCC;
+border-radius: 5px;
+background-color: #f6f6f6;
+font-size: 13px;
+line-height: 1.3;
+}
+#TOC .toctitle {
+font-weight: bold;
+font-size: 15px;
+margin-left: 5px;
+}
+#TOC ul {
+padding-left: 40px;
+margin-left: -1.5em;
+margin-top: 5px;
+margin-bottom: 5px;
+}
+#TOC ul ul {
+margin-left: -2em;
+}
+#TOC li {
+line-height: 16px;
+}
+table {
+margin: 1em auto;
+border-width: 1px;
+border-color: #DDDDDD;
+border-style: outset;
+border-collapse: collapse;
+}
+table th {
+border-width: 2px;
+padding: 5px;
+border-style: inset;
+}
+table td {
+border-width: 1px;
+border-style: inset;
+line-height: 18px;
+padding: 5px 5px;
+}
+table, table th, table td {
+border-left-style: none;
+border-right-style: none;
+}
+table thead, table tr.even {
+background-color: #f7f7f7;
+}
+p {
+margin: 0.5em 0;
+}
+blockquote {
+background-color: #f6f6f6;
+padding: 0.25em 0.75em;
+}
+hr {
+border-style: solid;
+border: none;
+border-top: 1px solid #777;
+margin: 28px 0;
+}
+dl {
+margin-left: 0;
+}
+dl dd {
+margin-bottom: 13px;
+margin-left: 13px;
+}
+dl dt {
+font-weight: bold;
+}
+ul {
+margin-top: 0;
+}
+ul li {
+list-style: circle outside;
+}
+ul ul {
+margin-bottom: 0;
+}
+pre, code {
+background-color: #f7f7f7;
+border-radius: 3px;
+color: #333;
+white-space: pre-wrap; 
+}
+pre {
+border-radius: 3px;
+margin: 5px 0px 10px 0px;
+padding: 10px;
+}
+pre:not([class]) {
+background-color: #f7f7f7;
+}
+code {
+font-family: Consolas, Monaco, 'Courier New', monospace;
+font-size: 85%;
+}
+p > code, li > code {
+padding: 2px 0px;
+}
+div.figure {
+text-align: center;
+}
+img {
+background-color: #FFFFFF;
+padding: 2px;
+border: 1px solid #DDDDDD;
+border-radius: 3px;
+border: 1px solid #CCCCCC;
+margin: 0 5px;
+}
+h1 {
+margin-top: 0;
+font-size: 35px;
+line-height: 40px;
+}
+h2 {
+border-bottom: 4px solid #f7f7f7;
+padding-top: 10px;
+padding-bottom: 2px;
+font-size: 145%;
+}
+h3 {
+border-bottom: 2px solid #f7f7f7;
+padding-top: 10px;
+font-size: 120%;
+}
+h4 {
+border-bottom: 1px solid #f7f7f7;
+margin-left: 8px;
+font-size: 105%;
+}
+h5, h6 {
+border-bottom: 1px solid #ccc;
+font-size: 105%;
+}
+a {
+color: #0033dd;
+text-decoration: none;
+}
+a:hover {
+color: #6666ff; }
+a:visited {
+color: #800080; }
+a:visited:hover {
+color: #BB00BB; }
+a[href^="http:"] {
+text-decoration: underline; }
+a[href^="https:"] {
+text-decoration: underline; }
+
+code > span.kw { color: #555; font-weight: bold; } 
+code > span.dt { color: #902000; } 
+code > span.dv { color: #40a070; } 
+code > span.bn { color: #d14; } 
+code > span.fl { color: #d14; } 
+code > span.ch { color: #d14; } 
+code > span.st { color: #d14; } 
+code > span.co { color: #888888; font-style: italic; } 
+code > span.ot { color: #007020; } 
+code > span.al { color: #ff0000; font-weight: bold; } 
+code > span.fu { color: #900; font-weight: bold; } 
+code > span.er { color: #a61717; background-color: #e3d2d2; } 
+</style>
+
+
+
+
+</head>
+
+<body>
+
+
+
+
+<h1 class="title toc-ignore">enderecobr: padronizador de endereços
+brasileiros</h1>
+
+
+
+<p><strong>enderecobr</strong> é um pacote de R que permite padronizar
+endereços brasileiros a partir de diferentes critérios. Os métodos de
+padronização atualmente incluem apenas manipulações de strings, não
+oferecendo suporte a correspondências probabilísticas entre strings.</p>
+<div id="instalação" class="section level2">
+<h2>Instalação</h2>
+<p>A última versão estável pode ser baixada do CRAN com o comando a
+seguir:</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" tabindex="-1"></a><span class="fu">install.packages</span>(<span class="st">&quot;enderecobr&quot;</span>)</span></code></pre></div>
+<p>Caso prefira, a versão em desenvolvimento também pode ser usada. Para
+isso, use o seguinte comando:</p>
+<div class="sourceCode" id="cb2"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" tabindex="-1"></a><span class="co"># install.packages(&quot;remotes&quot;)</span></span>
+<span id="cb2-2"><a href="#cb2-2" tabindex="-1"></a>remotes<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">&quot;ipeaGIT/enderecobr&quot;</span>)</span></code></pre></div>
+</div>
+<div id="utilização" class="section level2">
+<h2>Utilização</h2>
+<p>O <strong>enderecobr</strong> disponibiliza funções para padronizar
+os diversos campos de um endereço. Essas funções agem tanto sobre campos
+individuais quanto sobre um conjunto de campos. Vamos ver, primeiro,
+como funcionam as funções que agem sobre múltiplos campos
+simultaneamente.</p>
+<div id="padronização-de-múltiplos-campos-simultaneamente" class="section level3">
+<h3>Padronização de múltiplos campos simultaneamente</h3>
+<p>A <code>padronizar_enderecos()</code>, carro-chefe do pacote, atua de
+forma simultânea sobre os vários campos que podem compor um endereço.
+Para isso, ela recebe um dataframe e a correspondência entre suas
+colunas e os campos a serem padronizados:</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" tabindex="-1"></a><span class="fu">library</span>(enderecobr)</span>
+<span id="cb3-2"><a href="#cb3-2" tabindex="-1"></a></span>
+<span id="cb3-3"><a href="#cb3-3" tabindex="-1"></a>enderecos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb3-4"><a href="#cb3-4" tabindex="-1"></a>  <span class="at">id =</span> <span class="dv">1</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" tabindex="-1"></a>  <span class="at">tipo =</span> <span class="st">&quot;r&quot;</span>,</span>
+<span id="cb3-6"><a href="#cb3-6" tabindex="-1"></a>  <span class="at">logradouro =</span> <span class="st">&quot;ns sra da piedade&quot;</span>,</span>
+<span id="cb3-7"><a href="#cb3-7" tabindex="-1"></a>  <span class="at">nroLogradouro =</span> <span class="dv">20</span>,</span>
+<span id="cb3-8"><a href="#cb3-8" tabindex="-1"></a>  <span class="at">complemento =</span> <span class="st">&quot;qd 20&quot;</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" tabindex="-1"></a>  <span class="at">cep =</span> <span class="dv">25220020</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" tabindex="-1"></a>  <span class="at">bairro =</span> <span class="st">&quot;jd botanico&quot;</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" tabindex="-1"></a>  <span class="at">codmun_dom =</span> <span class="dv">3304557</span>,</span>
+<span id="cb3-12"><a href="#cb3-12" tabindex="-1"></a>  <span class="at">uf_dom =</span> <span class="st">&quot;rj&quot;</span></span>
+<span id="cb3-13"><a href="#cb3-13" tabindex="-1"></a>)</span>
+<span id="cb3-14"><a href="#cb3-14" tabindex="-1"></a></span>
+<span id="cb3-15"><a href="#cb3-15" tabindex="-1"></a>campos <span class="ot">&lt;-</span> <span class="fu">correspondencia_campos</span>(</span>
+<span id="cb3-16"><a href="#cb3-16" tabindex="-1"></a>  <span class="at">tipo_de_logradouro =</span> <span class="st">&quot;tipo&quot;</span>,</span>
+<span id="cb3-17"><a href="#cb3-17" tabindex="-1"></a>  <span class="at">logradouro =</span> <span class="st">&quot;logradouro&quot;</span>,</span>
+<span id="cb3-18"><a href="#cb3-18" tabindex="-1"></a>  <span class="at">numero =</span> <span class="st">&quot;nroLogradouro&quot;</span>,</span>
+<span id="cb3-19"><a href="#cb3-19" tabindex="-1"></a>  <span class="at">complemento =</span> <span class="st">&quot;complemento&quot;</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" tabindex="-1"></a>  <span class="at">cep =</span> <span class="st">&quot;cep&quot;</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" tabindex="-1"></a>  <span class="at">bairro =</span> <span class="st">&quot;bairro&quot;</span>,</span>
+<span id="cb3-22"><a href="#cb3-22" tabindex="-1"></a>  <span class="at">municipio =</span> <span class="st">&quot;codmun_dom&quot;</span>,</span>
+<span id="cb3-23"><a href="#cb3-23" tabindex="-1"></a>  <span class="at">estado =</span> <span class="st">&quot;uf_dom&quot;</span></span>
+<span id="cb3-24"><a href="#cb3-24" tabindex="-1"></a>)</span>
+<span id="cb3-25"><a href="#cb3-25" tabindex="-1"></a></span>
+<span id="cb3-26"><a href="#cb3-26" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(enderecos, <span class="at">campos_do_endereco =</span> campos)</span>
+<span id="cb3-27"><a href="#cb3-27" tabindex="-1"></a><span class="co">#&gt;       id   tipo        logradouro nroLogradouro complemento      cep</span></span>
+<span id="cb3-28"><a href="#cb3-28" tabindex="-1"></a><span class="co">#&gt;    &lt;num&gt; &lt;char&gt;            &lt;char&gt;         &lt;num&gt;      &lt;char&gt;    &lt;num&gt;</span></span>
+<span id="cb3-29"><a href="#cb3-29" tabindex="-1"></a><span class="co">#&gt; 1:     1      r ns sra da piedade            20       qd 20 25220020</span></span>
+<span id="cb3-30"><a href="#cb3-30" tabindex="-1"></a><span class="co">#&gt;         bairro codmun_dom uf_dom tipo_de_logradouro_padr</span></span>
+<span id="cb3-31"><a href="#cb3-31" tabindex="-1"></a><span class="co">#&gt;         &lt;char&gt;      &lt;num&gt; &lt;char&gt;                  &lt;char&gt;</span></span>
+<span id="cb3-32"><a href="#cb3-32" tabindex="-1"></a><span class="co">#&gt; 1: jd botanico    3304557     rj                     RUA</span></span>
+<span id="cb3-33"><a href="#cb3-33" tabindex="-1"></a><span class="co">#&gt;             logradouro_padr numero_padr complemento_padr  cep_padr</span></span>
+<span id="cb3-34"><a href="#cb3-34" tabindex="-1"></a><span class="co">#&gt;                      &lt;char&gt;      &lt;char&gt;           &lt;char&gt;    &lt;char&gt;</span></span>
+<span id="cb3-35"><a href="#cb3-35" tabindex="-1"></a><span class="co">#&gt; 1: NOSSA SENHORA DA PIEDADE          20        QUADRA 20 25220-020</span></span>
+<span id="cb3-36"><a href="#cb3-36" tabindex="-1"></a><span class="co">#&gt;        bairro_padr municipio_padr    estado_padr</span></span>
+<span id="cb3-37"><a href="#cb3-37" tabindex="-1"></a><span class="co">#&gt;             &lt;char&gt;         &lt;char&gt;         &lt;char&gt;</span></span>
+<span id="cb3-38"><a href="#cb3-38" tabindex="-1"></a><span class="co">#&gt; 1: JARDIM BOTANICO RIO DE JANEIRO RIO DE JANEIRO</span></span></code></pre></div>
+<p>Note que no exemplo acima nós também utiliza a função
+<code>correspondencia_campos()</code>, que facilita o processo de
+especificação de correspondência entre as colunas do dataframe e os
+campos do endereço a serem padronizados. Com ela, nós especificamos que
+a coluna que contém a informação de tipo de logradouro se chama
+<code>&quot;tipo&quot;</code>, que a coluna de número do logradouro se chama
+<code>&quot;nroLogradouro&quot;</code>, etc. Na prática, no entanto, essa função é
+opcional, e poderíamos simplesmente passar um vetor de caracteres no
+formato
+<code>c(tipo_de_logradouro = &quot;tipo&quot;, logradouro = &quot;logradouro&quot;, ...)</code>.
+A <code>correspondencia_campos()</code>, no entanto, realiza alguns
+testes no input, garantindo que o vetor a ser passado pra
+<code>padronizar_enderecos()</code> esteja corretamente formatado.</p>
+<p>A <code>padronizar_enderecos()</code> contém, ainda, três parâmetros
+adicionais. O <code>manter_cols_extras</code> determina as colunas
+incluídas no output da função. Caso seja <code>TRUE</code> (valor
+padrão), todas as colunas do dataframe original são mantidas; caso seja
+<code>FALSE</code>, apenas as colunas usadas na padronização e seus
+respectivos resultados são preservados. O bloco abaixo demonstra essa
+funcionalidade:</p>
+<div class="sourceCode" id="cb4"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" tabindex="-1"></a>campos <span class="ot">&lt;-</span> <span class="fu">correspondencia_campos</span>(</span>
+<span id="cb4-2"><a href="#cb4-2" tabindex="-1"></a>  <span class="at">tipo_de_logradouro =</span> <span class="st">&quot;tipo&quot;</span>,</span>
+<span id="cb4-3"><a href="#cb4-3" tabindex="-1"></a>  <span class="at">logradouro =</span> <span class="st">&quot;logradouro&quot;</span></span>
+<span id="cb4-4"><a href="#cb4-4" tabindex="-1"></a>)</span>
+<span id="cb4-5"><a href="#cb4-5" tabindex="-1"></a></span>
+<span id="cb4-6"><a href="#cb4-6" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(enderecos, campos, <span class="at">manter_cols_extras =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-7"><a href="#cb4-7" tabindex="-1"></a><span class="co">#&gt;       id nroLogradouro complemento      cep      bairro codmun_dom uf_dom</span></span>
+<span id="cb4-8"><a href="#cb4-8" tabindex="-1"></a><span class="co">#&gt;    &lt;num&gt;         &lt;num&gt;      &lt;char&gt;    &lt;num&gt;      &lt;char&gt;      &lt;num&gt; &lt;char&gt;</span></span>
+<span id="cb4-9"><a href="#cb4-9" tabindex="-1"></a><span class="co">#&gt; 1:     1            20       qd 20 25220020 jd botanico    3304557     rj</span></span>
+<span id="cb4-10"><a href="#cb4-10" tabindex="-1"></a><span class="co">#&gt;      tipo        logradouro tipo_de_logradouro_padr          logradouro_padr</span></span>
+<span id="cb4-11"><a href="#cb4-11" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;            &lt;char&gt;                  &lt;char&gt;                   &lt;char&gt;</span></span>
+<span id="cb4-12"><a href="#cb4-12" tabindex="-1"></a><span class="co">#&gt; 1:      r ns sra da piedade                     RUA NOSSA SENHORA DA PIEDADE</span></span>
+<span id="cb4-13"><a href="#cb4-13" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(enderecos, campos, <span class="at">manter_cols_extras =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb4-15"><a href="#cb4-15" tabindex="-1"></a><span class="co">#&gt;      tipo        logradouro tipo_de_logradouro_padr          logradouro_padr</span></span>
+<span id="cb4-16"><a href="#cb4-16" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;            &lt;char&gt;                  &lt;char&gt;                   &lt;char&gt;</span></span>
+<span id="cb4-17"><a href="#cb4-17" tabindex="-1"></a><span class="co">#&gt; 1:      r ns sra da piedade                     RUA NOSSA SENHORA DA PIEDADE</span></span></code></pre></div>
+<p>O <code>combinar_logradouro</code>, por sua vez, determina se os
+campos que compõem o logradouro (tipo, nome e número) devem ser
+combinados em um único campo padronizado de logradouro completo. Caso
+seja <code>FALSE</code>(valor padrão), os campos permanecem separados;
+se for <code>TRUE</code>, são combinados. Nesse caso, o parâmetro
+<code>logradouro</code> da <code>correspondencia_campos()</code> deve
+ser interpretado como o <em>nome</em> do logradouro. A seguir,
+demonstramos essa funcionalidade:</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" tabindex="-1"></a>enderecos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" tabindex="-1"></a>  <span class="at">tipo =</span> <span class="st">&quot;r&quot;</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" tabindex="-1"></a>  <span class="at">logradouro =</span> <span class="st">&quot;ns sra da piedade&quot;</span>,</span>
+<span id="cb5-4"><a href="#cb5-4" tabindex="-1"></a>  <span class="at">nroLogradouro =</span> <span class="dv">20</span></span>
+<span id="cb5-5"><a href="#cb5-5" tabindex="-1"></a>)</span>
+<span id="cb5-6"><a href="#cb5-6" tabindex="-1"></a></span>
+<span id="cb5-7"><a href="#cb5-7" tabindex="-1"></a>campos <span class="ot">&lt;-</span> <span class="fu">correspondencia_campos</span>(</span>
+<span id="cb5-8"><a href="#cb5-8" tabindex="-1"></a>  <span class="at">tipo_de_logradouro =</span> <span class="st">&quot;tipo&quot;</span>,</span>
+<span id="cb5-9"><a href="#cb5-9" tabindex="-1"></a>  <span class="at">logradouro =</span> <span class="st">&quot;logradouro&quot;</span>,</span>
+<span id="cb5-10"><a href="#cb5-10" tabindex="-1"></a>  <span class="at">numero =</span> <span class="st">&quot;nroLogradouro&quot;</span></span>
+<span id="cb5-11"><a href="#cb5-11" tabindex="-1"></a>)</span>
+<span id="cb5-12"><a href="#cb5-12" tabindex="-1"></a></span>
+<span id="cb5-13"><a href="#cb5-13" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(enderecos, campos, <span class="at">combinar_logradouro =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb5-14"><a href="#cb5-14" tabindex="-1"></a><span class="co">#&gt;      tipo        logradouro nroLogradouro tipo_de_logradouro_padr</span></span>
+<span id="cb5-15"><a href="#cb5-15" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;            &lt;char&gt;         &lt;num&gt;                  &lt;char&gt;</span></span>
+<span id="cb5-16"><a href="#cb5-16" tabindex="-1"></a><span class="co">#&gt; 1:      r ns sra da piedade            20                     RUA</span></span>
+<span id="cb5-17"><a href="#cb5-17" tabindex="-1"></a><span class="co">#&gt;             logradouro_padr numero_padr</span></span>
+<span id="cb5-18"><a href="#cb5-18" tabindex="-1"></a><span class="co">#&gt;                      &lt;char&gt;      &lt;char&gt;</span></span>
+<span id="cb5-19"><a href="#cb5-19" tabindex="-1"></a><span class="co">#&gt; 1: NOSSA SENHORA DA PIEDADE          20</span></span>
+<span id="cb5-20"><a href="#cb5-20" tabindex="-1"></a></span>
+<span id="cb5-21"><a href="#cb5-21" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(enderecos, campos, <span class="at">combinar_logradouro =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb5-22"><a href="#cb5-22" tabindex="-1"></a><span class="co">#&gt;      tipo        logradouro nroLogradouro        logradouro_completo_padr</span></span>
+<span id="cb5-23"><a href="#cb5-23" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;            &lt;char&gt;         &lt;num&gt;                          &lt;char&gt;</span></span>
+<span id="cb5-24"><a href="#cb5-24" tabindex="-1"></a><span class="co">#&gt; 1:      r ns sra da piedade            20 RUA NOSSA SENHORA DA PIEDADE 20</span></span></code></pre></div>
+<p>O terceiro parâmetro, <code>checar_tipos</code>, tem efeito apenas
+quando <code>combinar_logradouro</code> é <code>TRUE</code>, e deve ser
+usado para sinalizar se a ocorrência de duplicatas entre os tipos e
+nomes de logradouros deve ser verificada ao combiná-los (por exemplo,
+quando o tipo é descrito como “RUA” e o nome como “RUA BOTAFOGO”). Caso
+seja <code>FALSE</code> (valor padrão), a verificação não é feita; se
+for <code>TRUE</code>, a verificação é realizada e valores duplicados
+são removidos, como apresentado a seguir:</p>
+<div class="sourceCode" id="cb6"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" tabindex="-1"></a>enderecos <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb6-2"><a href="#cb6-2" tabindex="-1"></a>  <span class="at">tipo =</span> <span class="st">&quot;r&quot;</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" tabindex="-1"></a>  <span class="at">logradouro =</span> <span class="st">&quot;r ns sra da piedade&quot;</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" tabindex="-1"></a>  <span class="at">nroLogradouro =</span> <span class="dv">20</span></span>
+<span id="cb6-5"><a href="#cb6-5" tabindex="-1"></a>)</span>
+<span id="cb6-6"><a href="#cb6-6" tabindex="-1"></a></span>
+<span id="cb6-7"><a href="#cb6-7" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(</span>
+<span id="cb6-8"><a href="#cb6-8" tabindex="-1"></a>  enderecos,</span>
+<span id="cb6-9"><a href="#cb6-9" tabindex="-1"></a>  campos,</span>
+<span id="cb6-10"><a href="#cb6-10" tabindex="-1"></a>  <span class="at">combinar_logradouro =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-11"><a href="#cb6-11" tabindex="-1"></a>  <span class="at">checar_tipos =</span> <span class="cn">FALSE</span></span>
+<span id="cb6-12"><a href="#cb6-12" tabindex="-1"></a>)</span>
+<span id="cb6-13"><a href="#cb6-13" tabindex="-1"></a><span class="co">#&gt;      tipo          logradouro nroLogradouro            logradouro_completo_padr</span></span>
+<span id="cb6-14"><a href="#cb6-14" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;              &lt;char&gt;         &lt;num&gt;                              &lt;char&gt;</span></span>
+<span id="cb6-15"><a href="#cb6-15" tabindex="-1"></a><span class="co">#&gt; 1:      r r ns sra da piedade            20 RUA RUA NOSSA SENHORA DA PIEDADE 20</span></span>
+<span id="cb6-16"><a href="#cb6-16" tabindex="-1"></a></span>
+<span id="cb6-17"><a href="#cb6-17" tabindex="-1"></a><span class="fu">padronizar_enderecos</span>(</span>
+<span id="cb6-18"><a href="#cb6-18" tabindex="-1"></a>  enderecos,</span>
+<span id="cb6-19"><a href="#cb6-19" tabindex="-1"></a>  campos,</span>
+<span id="cb6-20"><a href="#cb6-20" tabindex="-1"></a>  <span class="at">combinar_logradouro =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb6-21"><a href="#cb6-21" tabindex="-1"></a>  <span class="at">checar_tipos =</span> <span class="cn">TRUE</span></span>
+<span id="cb6-22"><a href="#cb6-22" tabindex="-1"></a>)</span>
+<span id="cb6-23"><a href="#cb6-23" tabindex="-1"></a><span class="co">#&gt;      tipo          logradouro nroLogradouro        logradouro_completo_padr</span></span>
+<span id="cb6-24"><a href="#cb6-24" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;              &lt;char&gt;         &lt;num&gt;                          &lt;char&gt;</span></span>
+<span id="cb6-25"><a href="#cb6-25" tabindex="-1"></a><span class="co">#&gt; 1:      r r ns sra da piedade            20 RUA NOSSA SENHORA DA PIEDADE 20</span></span></code></pre></div>
+<p>Os parâmetros <code>combinar_logradouro</code> e
+<code>checar_tipos</code> acionam, de forma oculta, outra função que
+lida com múltiplos campos simultaneamente: a
+<code>padronizar_logradouros_completos()</code>. Essa função também pode
+ser usada de forma separada e, de forma similiar à
+<code>padronizar_enderecos()</code>, recebe um dataframe com as
+informações do logradouro (tipo, nome e número) e a correspondência
+entre suas colunas e os campos a serem padronizados:</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" tabindex="-1"></a>campos <span class="ot">&lt;-</span> <span class="fu">correspondencia_logradouro</span>(</span>
+<span id="cb7-2"><a href="#cb7-2" tabindex="-1"></a>  <span class="at">tipo_de_logradouro =</span> <span class="st">&quot;tipo&quot;</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" tabindex="-1"></a>  <span class="at">nome_do_logradouro =</span> <span class="st">&quot;logradouro&quot;</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" tabindex="-1"></a>  <span class="at">numero =</span> <span class="st">&quot;nroLogradouro&quot;</span></span>
+<span id="cb7-5"><a href="#cb7-5" tabindex="-1"></a>)</span>
+<span id="cb7-6"><a href="#cb7-6" tabindex="-1"></a></span>
+<span id="cb7-7"><a href="#cb7-7" tabindex="-1"></a><span class="fu">padronizar_logradouros_completos</span>(enderecos, <span class="at">campos_do_logradouro =</span> campos)</span>
+<span id="cb7-8"><a href="#cb7-8" tabindex="-1"></a><span class="co">#&gt;      tipo          logradouro nroLogradouro            logradouro_completo_padr</span></span>
+<span id="cb7-9"><a href="#cb7-9" tabindex="-1"></a><span class="co">#&gt;    &lt;char&gt;              &lt;char&gt;         &lt;num&gt;                              &lt;char&gt;</span></span>
+<span id="cb7-10"><a href="#cb7-10" tabindex="-1"></a><span class="co">#&gt; 1:      r r ns sra da piedade            20 RUA RUA NOSSA SENHORA DA PIEDADE 20</span></span></code></pre></div>
+<p>Note que, nesse caso, usamos a função
+<code>campos_do_logradouro()</code> para estabelecer a correspondência
+entre colunas e campos do endereço, mas também poderíamos passar um
+vetor de caracteres no argumento <code>campos_do_logradouro</code>. A
+<code>padronizar_logradouros_completos()</code> também inclui os
+parâmetros <code>manter_cols_extras</code> e <code>checar_tipos</code>,
+que funcionam de forma idêntica aos parâmetros de mesmo nome da
+<code>padronizar_enderecos()</code>.</p>
+</div>
+<div id="padronização-de-campos-individuais" class="section level3">
+<h3>Padronização de campos individuais</h3>
+<p>Por trás dos panos, tanto a <code>padronizar_enderecos()</code>
+quanto a <code>padronizar_logradouros_completos()</code> utilizam
+diversas outras funções que padronizam campos de forma individual. Cada
+uma delas recebe um vetor com valores não padronizados e retorna um
+vetor de mesmo tamanho com os respectivos valores padronizados. As
+funções atualmente disponíveis são:</p>
+<ul>
+<li><code>padronizar_estados()</code></li>
+<li><code>padronizar_municipios()</code></li>
+<li><code>padronizar_bairros()</code></li>
+<li><code>padronizar_ceps()</code></li>
+<li><code>padronizar_logradouros()</code></li>
+<li><code>padronizar_numeros()</code></li>
+<li><code>padronizar_tipos_de_logradouro()</code></li>
+<li><code>padronizar_complementos()</code></li>
+</ul>
+<p>A <code>padronizar_estados()</code> aceita vetores de strings e
+números. Caso numérico, o vetor deve conter o <a href="https://www.ibge.gov.br/explica/codigos-dos-municipios.php">código
+do IBGE</a> de cada estado. Caso seja composto de strings, o vetor pode
+conter a sigla do estado, seu código ou seu nome por extenso. Nese caso,
+a função ainda aplica diversas manipulações para chegar a um valor
+padronizado, como a conversão de caracteres para caixa alta, remoção de
+acentos e caracteres não ASCII e remoção de espaços em branco antes e
+depois dos valores e de espaços em excesso entre palavras. O código
+abaixo apresenta exemplos de aplicação da função com vetores numéricos e
+de strings.</p>
+<div class="sourceCode" id="cb8"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" tabindex="-1"></a>estados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;21&quot;</span>, <span class="st">&quot; 21&quot;</span>, <span class="st">&quot;MA&quot;</span>, <span class="st">&quot; MA &quot;</span>, <span class="st">&quot;ma&quot;</span>, <span class="st">&quot;MARANHÃO&quot;</span>)</span>
+<span id="cb8-2"><a href="#cb8-2" tabindex="-1"></a><span class="fu">padronizar_estados</span>(estados)</span>
+<span id="cb8-3"><a href="#cb8-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;MARANHAO&quot; &quot;MARANHAO&quot; &quot;MARANHAO&quot; &quot;MARANHAO&quot; &quot;MARANHAO&quot; &quot;MARANHAO&quot;</span></span>
+<span id="cb8-4"><a href="#cb8-4" tabindex="-1"></a></span>
+<span id="cb8-5"><a href="#cb8-5" tabindex="-1"></a>estados <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">21</span>, <span class="dv">32</span>)</span>
+<span id="cb8-6"><a href="#cb8-6" tabindex="-1"></a><span class="fu">padronizar_estados</span>(estados)</span>
+<span id="cb8-7"><a href="#cb8-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;MARANHAO&quot;       &quot;ESPIRITO SANTO&quot;</span></span></code></pre></div>
+<p>A função de padronização de campos de município,
+<code>padronizar_municipios()</code>, funciona de forma muito
+semelhante, aceitando também valores numéricos representando os códigos
+dos municípios e strings. As mesmas manipulações de remoção de espaços,
+conversão para caixa alta e conversão para caracteres são aplicadas
+(assim como nos demais tratamentos de vetores de strings que serão
+apresentados a seguir), mas a função também verifica erros ortográficos
+frequentemente observados nos nomes dos municípios (e.g. Moji Mirim
+-&gt; Mogi Mirim, Parati -&gt; Paraty).</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" tabindex="-1"></a>municipios <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" tabindex="-1"></a>  <span class="st">&quot;3304557&quot;</span>, <span class="st">&quot;003304557&quot;</span>, <span class="st">&quot; 3304557 &quot;</span>, <span class="st">&quot;RIO DE JANEIRO&quot;</span>, <span class="st">&quot;rio de janeiro&quot;</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" tabindex="-1"></a>  <span class="st">&quot;SÃO PAULO&quot;</span></span>
+<span id="cb9-4"><a href="#cb9-4" tabindex="-1"></a>)</span>
+<span id="cb9-5"><a href="#cb9-5" tabindex="-1"></a><span class="fu">padronizar_municipios</span>(municipios)</span>
+<span id="cb9-6"><a href="#cb9-6" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RIO DE JANEIRO&quot; &quot;RIO DE JANEIRO&quot; &quot;RIO DE JANEIRO&quot; &quot;RIO DE JANEIRO&quot;</span></span>
+<span id="cb9-7"><a href="#cb9-7" tabindex="-1"></a><span class="co">#&gt; [5] &quot;RIO DE JANEIRO&quot; &quot;SAO PAULO&quot;</span></span>
+<span id="cb9-8"><a href="#cb9-8" tabindex="-1"></a></span>
+<span id="cb9-9"><a href="#cb9-9" tabindex="-1"></a>municipios <span class="ot">&lt;-</span> <span class="dv">3304557</span></span>
+<span id="cb9-10"><a href="#cb9-10" tabindex="-1"></a><span class="fu">padronizar_municipios</span>(municipios)</span>
+<span id="cb9-11"><a href="#cb9-11" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RIO DE JANEIRO&quot;</span></span>
+<span id="cb9-12"><a href="#cb9-12" tabindex="-1"></a></span>
+<span id="cb9-13"><a href="#cb9-13" tabindex="-1"></a>municipios <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;PARATI&quot;</span>, <span class="st">&quot;MOJI MIRIM&quot;</span>)</span>
+<span id="cb9-14"><a href="#cb9-14" tabindex="-1"></a><span class="fu">padronizar_municipios</span>(municipios)</span>
+<span id="cb9-15"><a href="#cb9-15" tabindex="-1"></a><span class="co">#&gt; [1] &quot;PARATY&quot;     &quot;MOGI MIRIM&quot;</span></span></code></pre></div>
+<p>A <code>padronizar_bairros()</code> trabalha exclusivamente com
+vetores de strings. Como os nomes de bairros são muito mais variados e,
+consequentemente, menos rigidamente controlados do que os de estados e
+municípios, a função se atém a corrigir erros ortográficos e a expandir
+abreviações frequentemente utilizadas através de diversas <a href="https://en.wikipedia.org/wiki/Regular_expression">expressões
+regulares (regexes)</a>. O exemplo abaixo mostra algumas das muitas
+abreviações usualmente empregadas no preenchimento de endereços.</p>
+<div class="sourceCode" id="cb10"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" tabindex="-1"></a>bairros <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb10-2"><a href="#cb10-2" tabindex="-1"></a>  <span class="st">&quot;PRQ IND&quot;</span>,</span>
+<span id="cb10-3"><a href="#cb10-3" tabindex="-1"></a>  <span class="st">&quot;NSA SEN DE FATIMA&quot;</span>,</span>
+<span id="cb10-4"><a href="#cb10-4" tabindex="-1"></a>  <span class="st">&quot;ILHA DO GOV&quot;</span>,</span>
+<span id="cb10-5"><a href="#cb10-5" tabindex="-1"></a>  <span class="st">&quot;VL OLIMPICA&quot;</span>,</span>
+<span id="cb10-6"><a href="#cb10-6" tabindex="-1"></a>  <span class="st">&quot;NUC RES&quot;</span></span>
+<span id="cb10-7"><a href="#cb10-7" tabindex="-1"></a>)</span>
+<span id="cb10-8"><a href="#cb10-8" tabindex="-1"></a><span class="fu">padronizar_bairros</span>(bairros)</span>
+<span id="cb10-9"><a href="#cb10-9" tabindex="-1"></a><span class="co">#&gt; [1] &quot;PARQUE INDUSTRIAL&quot;       &quot;NOSSA SENHORA DE FATIMA&quot;</span></span>
+<span id="cb10-10"><a href="#cb10-10" tabindex="-1"></a><span class="co">#&gt; [3] &quot;ILHA DO GOVERNADOR&quot;      &quot;VILA OLIMPICA&quot;          </span></span>
+<span id="cb10-11"><a href="#cb10-11" tabindex="-1"></a><span class="co">#&gt; [5] &quot;NUCLEO RESIDENCIAL&quot;</span></span></code></pre></div>
+<p>A <code>padronizar_ceps()</code> é outro exemplo de função que
+trabalha com strings e números. Caso o input seja numérico, a função
+verifica se os valores possuem comprimentos compatíveis com um CEP,
+adicionando zeros à esquerda se necessário (é muito comum que leitores
+de CSV, por exemplo, erroneamente leiam valores de CEP como números e
+excluam zeros à esquerda por considerá-los redundantes). Caso o input
+seja formado por strings, a função remove caracteres que frequentemente
+são usados para separar partes do CEP (e.g. pontos, vírgulas, espaços em
+branco) e verifica se o hífen separando os cinco primeiros dígitos dos
+três últimos está presente, adicionando-o caso contrário. A função ainda
+produz erros se recebe como input valores que não podem ser corretamente
+convertidos em CEPs, como no caso de strings contendo caracteres não
+numéricos e de strings com caracteres em excesso.</p>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" tabindex="-1"></a>ceps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;22290-140&quot;</span>, <span class="st">&quot;22.290-140&quot;</span>, <span class="st">&quot;22290 140&quot;</span>, <span class="st">&quot;22290140&quot;</span>)</span>
+<span id="cb11-2"><a href="#cb11-2" tabindex="-1"></a><span class="fu">padronizar_ceps</span>(ceps)</span>
+<span id="cb11-3"><a href="#cb11-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;22290-140&quot; &quot;22290-140&quot; &quot;22290-140&quot; &quot;22290-140&quot;</span></span>
+<span id="cb11-4"><a href="#cb11-4" tabindex="-1"></a></span>
+<span id="cb11-5"><a href="#cb11-5" tabindex="-1"></a>ceps <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">22290140</span>, <span class="dv">1000000</span>)</span>
+<span id="cb11-6"><a href="#cb11-6" tabindex="-1"></a><span class="fu">padronizar_ceps</span>(ceps)</span>
+<span id="cb11-7"><a href="#cb11-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;22290-140&quot; &quot;01000-000&quot;</span></span>
+<span id="cb11-8"><a href="#cb11-8" tabindex="-1"></a></span>
+<span id="cb11-9"><a href="#cb11-9" tabindex="-1"></a><span class="fu">padronizar_ceps</span>(<span class="st">&quot;2229014a&quot;</span>)</span>
+<span id="cb11-10"><a href="#cb11-10" tabindex="-1"></a><span class="co">#&gt; Error in `padronizar_ceps()`:</span></span>
+<span id="cb11-11"><a href="#cb11-11" tabindex="-1"></a><span class="co">#&gt; ! CEP não deve conter letras.</span></span>
+<span id="cb11-12"><a href="#cb11-12" tabindex="-1"></a><span class="co">#&gt; ℹ O elemento com índice 1 possui letras.</span></span>
+<span id="cb11-13"><a href="#cb11-13" tabindex="-1"></a></span>
+<span id="cb11-14"><a href="#cb11-14" tabindex="-1"></a><span class="fu">padronizar_ceps</span>(<span class="st">&quot;022290140&quot;</span>)</span>
+<span id="cb11-15"><a href="#cb11-15" tabindex="-1"></a><span class="co">#&gt; Error in `padronizar_ceps()`:</span></span>
+<span id="cb11-16"><a href="#cb11-16" tabindex="-1"></a><span class="co">#&gt; ! CEP não deve conter mais que 8 dígitos.</span></span>
+<span id="cb11-17"><a href="#cb11-17" tabindex="-1"></a><span class="co">#&gt; ℹ O elemento com índice 1 possui mais que 8 dígitos após padronização.</span></span></code></pre></div>
+<p>A tarefa de padronizar logradouros é a mais complexa dentre as
+apresentadas até aqui, uma vez que o campo de logradouro é o que
+apresenta maior variabilidade de input. A
+<code>padronizar_logradouros()</code>, portanto, assim como a função de
+padronização de bairros, se limita a expandir abreviações frequentemente
+utilizadas e a corrigir alguns poucos erros de digitação, fora o
+tratamento usual dado a strings, como conversão para caixa alta, remoção
+de espaços em excesso e antes e depois das strings, etc.</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" tabindex="-1"></a>logradouros <span class="ot">&lt;-</span> <span class="fu">c</span>(</span>
+<span id="cb12-2"><a href="#cb12-2" tabindex="-1"></a>  <span class="st">&quot;r. gen.. glicério, 137&quot;</span>,</span>
+<span id="cb12-3"><a href="#cb12-3" tabindex="-1"></a>  <span class="st">&quot;cond pres j. k., qd 05 lt 02 1&quot;</span>,</span>
+<span id="cb12-4"><a href="#cb12-4" tabindex="-1"></a>  <span class="st">&quot;av d pedro I, 020&quot;</span></span>
+<span id="cb12-5"><a href="#cb12-5" tabindex="-1"></a>)</span>
+<span id="cb12-6"><a href="#cb12-6" tabindex="-1"></a><span class="fu">padronizar_logradouros</span>(logradouros)</span>
+<span id="cb12-7"><a href="#cb12-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RUA GENERAL GLICERIO, 137&quot;                                    </span></span>
+<span id="cb12-8"><a href="#cb12-8" tabindex="-1"></a><span class="co">#&gt; [2] &quot;CONDOMINIO PRESIDENTE JUSCELINO KUBITSCHEK, QUADRA 5 LOTE 2 1&quot;</span></span>
+<span id="cb12-9"><a href="#cb12-9" tabindex="-1"></a><span class="co">#&gt; [3] &quot;AVENIDA DOM PEDRO I, 20&quot;</span></span></code></pre></div>
+<p>A <code>padronizar_numeros()</code> tem como objetivo padronizar o
+número do logradouro, caso este esteja em um campo separado do
+logradouro propriamente dito. A função aceita vetores de números e
+strings e retorna um vetor de strings. Os tratamentos incluem a remoção
+de zeros à esquerda, remoção de espaços em branco em excesso e a
+substituição de variações de SN (sem número) por “S/N”.</p>
+<div class="sourceCode" id="cb13"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" tabindex="-1"></a>numeros <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;0210&quot;</span>, <span class="st">&quot;001&quot;</span>, <span class="st">&quot;1&quot;</span>, <span class="st">&quot;S N&quot;</span>, <span class="st">&quot;S/N&quot;</span>, <span class="st">&quot;SN&quot;</span>, <span class="st">&quot;0180  0181&quot;</span>)</span>
+<span id="cb13-2"><a href="#cb13-2" tabindex="-1"></a><span class="fu">padronizar_numeros</span>(numeros)</span>
+<span id="cb13-3"><a href="#cb13-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;210&quot;     &quot;1&quot;       &quot;1&quot;       &quot;S/N&quot;     &quot;S/N&quot;     &quot;S/N&quot;     &quot;180 181&quot;</span></span>
+<span id="cb13-4"><a href="#cb13-4" tabindex="-1"></a></span>
+<span id="cb13-5"><a href="#cb13-5" tabindex="-1"></a>numeros <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="dv">210</span>, <span class="dv">1</span>, <span class="dv">10000</span>)</span>
+<span id="cb13-6"><a href="#cb13-6" tabindex="-1"></a><span class="fu">padronizar_numeros</span>(numeros)</span>
+<span id="cb13-7"><a href="#cb13-7" tabindex="-1"></a><span class="co">#&gt; [1] &quot;210&quot;   &quot;1&quot;     &quot;10000&quot;</span></span></code></pre></div>
+<p>Outra função que atua sobre uma informação específica do logradouro,
+caso essa seja fornecida separadamente, é a
+<code>padronizar_tipos_de_logradouro()</code>. Fora o tratamento usual
+dado a strings, a função também expande abreviações frequentemente
+observadas no campo de tipo de logradouro.</p>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" tabindex="-1"></a>tipos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;r&quot;</span>, <span class="st">&quot;R.&quot;</span>, <span class="st">&quot;AVN&quot;</span>, <span class="st">&quot;AVE&quot;</span>, <span class="st">&quot;JDM&quot;</span>, <span class="st">&quot;QD&quot;</span>)</span>
+<span id="cb14-2"><a href="#cb14-2" tabindex="-1"></a><span class="fu">padronizar_tipos_de_logradouro</span>(tipos)</span>
+<span id="cb14-3"><a href="#cb14-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;RUA&quot;     &quot;RUA&quot;     &quot;AVENIDA&quot; &quot;AVENIDA&quot; &quot;JARDIM&quot;  &quot;QUADRA&quot;</span></span></code></pre></div>
+<p>Por fim, a <code>padronizar_complementos()</code> age de forma
+similar às funções de padronização de logradouros e bairros, porém
+agindo de forma mais específica em abreviações e observações
+frequentemente observados na especificação de complementos de
+logradouros.</p>
+<div class="sourceCode" id="cb15"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" tabindex="-1"></a>complementos <span class="ot">&lt;-</span> <span class="fu">c</span>(<span class="st">&quot;QD1 LT2 CS3&quot;</span>, <span class="st">&quot;APTO. 405&quot;</span>, <span class="st">&quot;PRX CX POST 450&quot;</span>)</span>
+<span id="cb15-2"><a href="#cb15-2" tabindex="-1"></a><span class="fu">padronizar_complementos</span>(complementos)</span>
+<span id="cb15-3"><a href="#cb15-3" tabindex="-1"></a><span class="co">#&gt; [1] &quot;QUADRA 1 LOTE 2 CASA 3&quot;   &quot;APARTAMENTO 405&quot;         </span></span>
+<span id="cb15-4"><a href="#cb15-4" tabindex="-1"></a><span class="co">#&gt; [3] &quot;PROXIMO CAIXA POSTAL 450&quot;</span></span></code></pre></div>
+</div>
+<div id="controle-de-verbosidade" class="section level3">
+<h3>Controle de verbosidade</h3>
+<p>O disparo de mensagens com informações sobre a execução das funções
+pode ser controlado pela opção <code>enderecobr.verbose</code>, que
+recebe os valores <code>&quot;quiet&quot;</code> ou <code>&quot;verbose&quot;</code>, como
+demonstrado a seguir:</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" tabindex="-1"></a>campos <span class="ot">&lt;-</span> <span class="fu">correspondencia_logradouro</span>(</span>
+<span id="cb16-2"><a href="#cb16-2" tabindex="-1"></a>  <span class="at">nome_do_logradouro =</span> <span class="st">&quot;logradouro&quot;</span>,</span>
+<span id="cb16-3"><a href="#cb16-3" tabindex="-1"></a>  <span class="at">numero =</span> <span class="st">&quot;nroLogradouro&quot;</span></span>
+<span id="cb16-4"><a href="#cb16-4" tabindex="-1"></a>)</span>
+<span id="cb16-5"><a href="#cb16-5" tabindex="-1"></a></span>
+<span id="cb16-6"><a href="#cb16-6" tabindex="-1"></a><span class="co"># quieto, por padrão</span></span>
+<span id="cb16-7"><a href="#cb16-7" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">padronizar_logradouros_completos</span>(enderecos, campos)</span>
+<span id="cb16-8"><a href="#cb16-8" tabindex="-1"></a></span>
+<span id="cb16-9"><a href="#cb16-9" tabindex="-1"></a><span class="co"># verboso, se desejado</span></span>
+<span id="cb16-10"><a href="#cb16-10" tabindex="-1"></a>rlang<span class="sc">::</span><span class="fu">local_options</span>(<span class="st">&quot;enderecobr.verbose&quot;</span> <span class="ot">=</span> <span class="st">&quot;verbose&quot;</span>)</span>
+<span id="cb16-11"><a href="#cb16-11" tabindex="-1"></a>res <span class="ot">&lt;-</span> <span class="fu">padronizar_logradouros_completos</span>(enderecos, campos)</span>
+<span id="cb16-12"><a href="#cb16-12" tabindex="-1"></a><span class="co">#&gt; ✔ Padronizando nomes dos logradouros... [130ms]</span></span>
+<span id="cb16-13"><a href="#cb16-13" tabindex="-1"></a><span class="co">#&gt; ✔ Padronizando números... [111ms]</span></span>
+<span id="cb16-14"><a href="#cb16-14" tabindex="-1"></a><span class="co">#&gt; ✔ Trazendo números para o logradouro completo... [107ms]</span></span></code></pre></div>
+</div>
+</div>
+
+
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
