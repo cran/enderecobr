@@ -1,7 +1,7 @@
-6ff4008d4013b30513b2b0a88858e3cd *DESCRIPTION
+e9c9b20a08cd178bfc7c1ac6c2e389b0 *DESCRIPTION
 18078200401b222530740dc2f000ea84 *LICENSE
 4dcbe6ca2cabe5aff421e5718886336d *NAMESPACE
-79773e4632851defb101c133e89f824c *NEWS.md
+7ae545bbf0aacdf73b675ef45ee17879 *NEWS.md
 9ad922060e7a7d6201725938d58303a4 *R/codigos.R
 fab1f558362ca03280db938c72e9b940 *R/correspondencia_campos.R
 7d0966ab12169c2463035bb68eb452c6 *R/correspondencia_logradouro.R
@@ -29,7 +29,7 @@ b3507ad432f5f2e1fbc0731135a54e66 *inst/doc/enderecobr.html
 c9078692abbfce2057ec4eddbba6f5aa *man/codigos_municipios.Rd
 e5e06740eaf482bded2c0a048bb581d5 *man/correspondencia_campos.Rd
 3d6663561751c774bda5973c926e0710 *man/correspondencia_logradouro.Rd
-f4de1e77a12cf4c2a061808e0e1fa295 *man/enderecobr.Rd
+a999a3ddcd03b0ffc5ea305ae3eb6a21 *man/enderecobr.Rd
 48219fca1ec818a8f49f1fd7b04efc68 *man/figures/ipea_logo.png
 13b1559ffa65e5e7068e96c67d1858a0 *man/figures/logo.svg
 7995a5103b6172d547d8c4a9ddbeb108 *man/padronizar_bairros.Rd

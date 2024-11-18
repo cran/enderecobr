@@ -1,3 +1,9 @@
+# enderecobr 0.2.1
+
+## Notas
+
+- Lucas Mation adicionado como autor do pacote.
+
 # enderecobr 0.2.0
 
 ## Correção de bugs
