@@ -120,6 +120,7 @@ bairros <- c(
 padronizar_bairros(bairros)
 
 ## ----error=TRUE---------------------------------------------------------------
+try({
 ceps <- c("22290-140", "22.290-140", "22290 140", "22290140")
 padronizar_ceps(ceps)
 
@@ -129,6 +130,7 @@ padronizar_ceps(ceps)
 padronizar_ceps("2229014a")
 
 padronizar_ceps("022290140")
+})
 
 ## -----------------------------------------------------------------------------
 logradouros <- c(
