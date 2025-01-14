@@ -6,6 +6,9 @@
 #'
 #' @param numeros Um vetor de caracteres ou números. Os números de logradouro a
 #'   serem padronizados.
+#' @param formato Uma string. Como o resultado padronizado deve ser formatado.
+#'   Por padrão, `"character"`, fazendo com que a função retorne um vetor de
+#'   caracteres. Se `"integer"`, a função retorna um vetor de números inteiros.
 #'
 #' @return Um vetor de caracteres com os números de logradouros padronizados.
 #'
@@ -27,18 +30,31 @@
 #' padronizar_numeros(numeros)
 #'
 #' @export
-padronizar_numeros <- function(numeros) {
+padronizar_numeros <- function(numeros, formato = "character") {
   checkmate::assert(
     checkmate::check_character(numeros),
     checkmate::check_numeric(numeros),
     combine = "or"
   )
+  checkmate::assert(
+    checkmate::check_string(formato),
+    checkmate::check_names(
+      formato,
+      subset.of = c("character", "integer")
+    ),
+    combine = "and"
+  )
 
   if (is.numeric(numeros)) {
-    numeros_na <- which(is.na(numeros))
+    numeros_padrao <- data.table::fifelse(numeros == 0, NA_integer_, numeros)
 
-    numeros_padrao <- formatC(numeros, format = "d")
-    numeros_padrao[numeros_na] <- "S/N"
+    if (formato == "integer") {
+      numeros_padrao <- as.integer(numeros_padrao)
+      return(numeros_padrao)
+    }
+
+    numeros_padrao <- formatC(numeros_padrao, format = "d")
+    numeros_padrao[numeros_padrao == "NA"] <- "S/N"
 
     return(numeros_padrao)
   }
@@ -53,7 +69,7 @@ padronizar_numeros <- function(numeros) {
   numeros_padrao <- stringr::str_replace_all(
     numeros_padrao,
     c(
-      r"{\b0+(\d+)\b}" = "\\1", # 015 -> 15, 00001 -> 1, 0180 0181 -> 180 181
+      r"{(?<!\.)\b0+(\d+)\b}" = "\\1", # 015 -> 15, 00001 -> 1, 0180 0181 -> 180 181, mas não 1.028 -> 1.28
 
       r"{(\d+)\.(\d{3})}" = "\\1\\2", # separador de milhar
 
@@ -63,7 +79,47 @@ padronizar_numeros <- function(numeros) {
     )
   )
 
-  numeros_padrao[is.na(numeros_padrao) | numeros_padrao == ""] <- "S/N"
+  if (formato == "character") {
+    numeros_padrao[is.na(numeros_padrao) | numeros_padrao == ""] <- "S/N"
+  } else {
+    numeros_padrao[numeros_padrao == "S/N"] <- NA_character_
+
+    #warning_conversao_invalida()
+    numeros_padrao <- withCallingHandlers(
+      as.integer(numeros_padrao),
+      warning = function(cnd) {
+        warning_conversao_invalida()
+        rlang::cnd_muffle(cnd)
+      }
+    )
+  }
 
   return(numeros_padrao)
+}
+
+warning_conversao_invalida <- function() {
+  # a padronizar_numeros() pode tanto ser chamada individualmente ou como parte
+  # da função padronizar_enderecos(). nesse caso, precisamos que o erro aponte
+  # pra chamada da padronizar_enderecos(), já que o usuário não sabe que a
+  # padronizar_numeros é chamada internamente. pra isso, verificamos as chamadas
+  # feitas na stack e, caso seja feita pela função interna usada na
+  # padronizar_enderecos(), mudamos a chamada do erro
+
+  chamada_upstream <- tryCatch(sys.call(-15), error = function(cnd) NULL)
+
+  # rlang::parent_env() pula direto do function(cnd) pro GlobalEnv, não sei por
+  # quê, então usando sys.frame()
+  if (is.null(chamada_upstream) || as.character(chamada_upstream[[1]]) != "padronizar_enderecos") {
+    n_frame <- -7
+  } else {
+    n_frame <- -15
+  }
+
+  warning_endbr(
+    paste0(
+      "Alguns n\u00fameros n\u00e3o puderam ser convertidos para integer, ",
+      "introduzindo NAs no resultado."
+    ),
+    call = sys.frame(n_frame)
+  )
 }

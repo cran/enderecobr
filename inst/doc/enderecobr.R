@@ -34,6 +34,35 @@ padronizar_enderecos(enderecos, campos_do_endereco = campos)
 
 ## -----------------------------------------------------------------------------
 campos <- correspondencia_campos(
+  numero = "nroLogradouro",
+  estado = "uf_dom"
+)
+
+padronizar_enderecos(
+  enderecos[, c("nroLogradouro", "uf_dom")],
+  campos,
+  formato_estados = "por_extenso",
+  formato_numeros = "character"
+)
+
+padronizar_enderecos(
+  enderecos[, c("nroLogradouro", "uf_dom")],
+  campos,
+  formato_estados = "sigla",
+  formato_numeros = "integer"
+)
+
+# o exemplo abaixo gera um warning, pois o número não pode ser convertido para
+# inteiro de forma adequada
+
+padronizar_enderecos(
+  data.table::data.table(numero = "12A 13B"),
+  correspondencia_campos(numero = "numero"),
+  formato_numeros = "integer"
+)
+
+## -----------------------------------------------------------------------------
+campos <- correspondencia_campos(
   tipo_de_logradouro = "tipo",
   logradouro = "logradouro"
 )
@@ -93,6 +122,8 @@ padronizar_logradouros_completos(enderecos, campos_do_logradouro = campos)
 estados <- c("21", " 21", "MA", " MA ", "ma", "MARANHÃO")
 padronizar_estados(estados)
 
+padronizar_estados(estados, formato = "sigla")
+
 estados <- c(21, 32)
 padronizar_estados(estados)
 
@@ -143,6 +174,12 @@ padronizar_logradouros(logradouros)
 ## -----------------------------------------------------------------------------
 numeros <- c("0210", "001", "1", "S N", "S/N", "SN", "0180  0181")
 padronizar_numeros(numeros)
+
+# o exemplo abaixo gera um warning, pois "0180 0181" não pode ser adequadamente
+# convertido para um único valor inteiro - as variações de S/N, por sua vez, já
+# seriam convertidas para NA
+numeros <- c("0210", "001", "1", "S N", "S/N", "SN", "0180  0181")
+padronizar_numeros(numeros, formato = "integer")
 
 numeros <- c(210, 1, 10000)
 padronizar_numeros(numeros)

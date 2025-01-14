@@ -1,3 +1,22 @@
+# enderecobr 0.4.0
+
+## Correção de bugs
+
+- Corrigido bug na `padronizar_numeros()` em que zeros após o separador de
+milhares eram suprimidos. Por exemplo, "1.028" virava "1.28". Relacionado ao
+[issue #37](https://github.com/ipeaGIT/enderecobr/issues/37).
+- Corrigido bug na `padronizar_numeros()` em que zeros de vetores numéricos não
+eram adequadamente transformados em "S/N". Relacionado ao [issue
+#38](https://github.com/ipeaGIT/enderecobr/issues/38).
+
+## Novas funcionalidades
+
+- Novo argumento na `padronizar_numeros()`, `formato`, responsável por controlar
+como o resultado deve ser padronizado: se como um vetor de caracteres ou de
+inteiros.
+- Novo argumento na `padronizar_numeros()`, `formato_numeros`, que controla como
+deve ser feita a padronização de números dentro dessa função.
+
 # enderecobr 0.3.0
 
 ## Novas funcionalidades
