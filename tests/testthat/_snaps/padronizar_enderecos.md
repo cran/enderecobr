@@ -46,9 +46,27 @@
 ---
 
     Code
+      enderecobr::padronizar_enderecos(ends, correspondencia_campos(cep = "cep"))
+    Condition <erro_endbr_cep_com_digitos_demais>
+      Error in `enderecobr::padronizar_enderecos()`:
+      ! CEP não deve conter mais que 8 dígitos.
+      i O elemento com índice 1 possui mais que 8 dígitos após padronização.
+
+---
+
+    Code
       tester(ends, correspondencia_campos(cep = "cep"))
     Condition <erro_endbr_cep_com_letra>
       Error in `padronizar_enderecos()`:
+      ! CEP não deve conter letras.
+      i O elemento com índice 1 possui letras.
+
+---
+
+    Code
+      enderecobr::padronizar_enderecos(ends, correspondencia_campos(cep = "cep"))
+    Condition <erro_endbr_cep_com_letra>
+      Error in `enderecobr::padronizar_enderecos()`:
       ! CEP não deve conter letras.
       i O elemento com índice 1 possui letras.
 
@@ -163,6 +181,19 @@
       tester(ends, correspondencia_campos(numero = "numeros"), formato_numeros = "integer")
     Condition <warning_endbr_conversao_invalida>
       Warning in `padronizar_enderecos()`:
+      Alguns números não puderam ser convertidos para integer, introduzindo NAs no resultado.
+    Output
+         numeros numero_padr
+          <char>       <int>
+      1:    1 2           NA
+
+---
+
+    Code
+      enderecobr::padronizar_enderecos(ends, correspondencia_campos(numero = "numeros"),
+      formato_numeros = "integer")
+    Condition <warning_endbr_conversao_invalida>
+      Warning in `enderecobr::padronizar_enderecos()`:
       Alguns números não puderam ser convertidos para integer, introduzindo NAs no resultado.
     Output
          numeros numero_padr

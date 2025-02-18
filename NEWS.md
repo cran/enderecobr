@@ -1,3 +1,15 @@
+# enderecobr 0.4.1
+
+## Correção de bugs
+
+- Corrigido bug na `padronizar_enderecos()` (quando chamada via
+`enderecobr::padronizar_enderecos()`) em que a função resultava num erro quando,
+internamente, a `padronizar_numeros()` lançava um warning. Relacionado ao [issue
+#38](https://github.com/ipeagit/enderecobr/issues/38).
+- Corrigido bug na `padronizar_enderecos()` (quando chamada via
+`enderecobr::padronizar_enderecos()`) em que a função resultava num erro quando,
+internamente, a `padronizar_ceps()` identificava um CEP inválido.
+
 # enderecobr 0.4.0
 
 ## Correção de bugs
